@@ -8,8 +8,9 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 
-percent_sick = ChartModule([{"Label": "Percent Sick", "Color": "Pink"},],)
+percent_sick = ChartModule([{"Label": "Percent Ever Sick", "Color": "Pink"},],)
 num_infectious = ChartModule([{"Label": "Number Infectious", "Color": "Green"},],)
+quarantined = ChartModule([{"Label": "Tested and Quarantined", "Color": "Blue"},],)
 
 model_params = {
     "num_agents": UserSettableParameter("number", "Number of agents", value=1000),
@@ -54,7 +55,7 @@ model_params = {
 
 server = ModularServer(
     Contact_Trace_Model,
-    [percent_sick, num_infectious],
+    [percent_sick, num_infectious, quarantined],
     "Contact_Trace_Mesa_Model",
     model_params,
 )

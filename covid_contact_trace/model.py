@@ -19,6 +19,13 @@ def num_infectious(model):
     return infectious_now
 
 
+def quarantined(model):
+    quarantined = sum(
+        [1 if agent.quarantined else 0 for agent in model.schedule.agents]
+    )
+    return quarantined
+
+
 class Contact_Trace_Agent(Agent):  # noqa
     """
     Person, can be Susceptable, Pre-infectious, Infectious pre-symptomatic,
@@ -53,7 +60,7 @@ class Contact_Trace_Agent(Agent):  # noqa
 
         self.incubation = 999
         self.infectious_period = 999
-        self.contact_trace_period = 999
+        self.quarantine_countdown = 999
         self.recovered = False
         self.immune = False
         self.quarantined = False
@@ -83,11 +90,6 @@ class Contact_Trace_Agent(Agent):  # noqa
             self.contacts[self.step].extend(
                 random.sample(self.random_people, self.random_contacts)
             )
-
-            print(
-                f"agent {self.unique_id} has the following contacts on day {self.step}"
-            )
-            print(self.contacts[self.step])
 
     def infect(self):
         """
@@ -120,6 +122,28 @@ class Contact_Trace_Agent(Agent):  # noqa
             if self.infectious_period == 0:
                 self.state = "recovered"
                 self.infectious = False
+
+        elif self.state == "awaiting_quarantine":
+            self.quarantine_countdown += -1
+            if self.quarantine_countdown == 0:
+                print("quarantined infectious person")
+                self.state = "quarantined"
+                self.infectious = False
+                self.quarantined = True
+
+    def test(self):
+        """
+        random testing
+        """
+
+        # if the random number is below the percent tested and there are tests left
+        if random.random() <= self.model.percent_tested_per_day:
+            self.model.step_tests += -1
+
+            if self.state in ["pre_infectious", "infectious"]:
+                print("tested infectious person")
+                self.quarantine_countdown = self.model.turn_around_time
+                self.state = "awaiting_quarantine"
 
     def get_random_agent(self):
         return random.randrange(0, self.model.num_agents, 1,)
@@ -193,7 +217,7 @@ class Contact_Trace_Model(Model):
         self.num_agents = num_agents
 
         # self.schedule = RandomActivation(self)
-        self.schedule = StagedActivation(self, stage_list=["move", "infect"])
+        self.schedule = StagedActivation(self, stage_list=["move", "infect", "test"])
         # self.grid = MultiGrid(width=width, height=height, torus=False)
 
         # get workplaces
@@ -281,8 +305,6 @@ class Contact_Trace_Model(Model):
 
             agent.random_people = list(non_family - set(agent.family))
 
-            print(len(agent.random_people), agent.random_contacts)
-
             if num_sick > 0:
                 agent.sick = True
                 agent.pre_infectious = True
@@ -315,8 +337,9 @@ class Contact_Trace_Model(Model):
         # self.datacollector = DataCollector(model_reporters={"Number Sick": num_sick})
         self.datacollector = DataCollector(
             model_reporters={
-                "Percent Sick": percent_sick,
+                "Percent Ever Sick": percent_sick,
                 "Number Infectious": num_infectious,
+                "Tested and Quarantined": quarantined,
             }
         )
 
@@ -324,5 +347,7 @@ class Contact_Trace_Model(Model):
         """
         A model step. Used for collecting data and advancing the schedule
         """
+        self.step_tests = self.percent_tested_per_day * self.num_agents
+
         self.datacollector.collect(self)
         self.schedule.step()
