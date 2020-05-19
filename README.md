@@ -17,10 +17,10 @@ View at http://127.0.0.1:8521
 
 
 TODO:
-*Implement workplace dynamics - create coworkers each agent is more likely than random/less likely than family to contact each day
-*Allow for symptomatic-only testing if desired
-*Contact tracing
-*Quarantine Ignorers
-*False positive/negative testing
-*Impact from quarantining false positives (more ignorers?)
-*Performance improvements
+* Implement workplace dynamics - create coworkers each agent is more likely than random/less likely than family to contact each day
+* Allow for symptomatic-only testing if desired
+* Contact tracing
+* Quarantine Ignorers
+* False positive/negative testing
+* Impact from quarantining false positives (more ignorers?)
+* Performance improvements
