@@ -1,0 +1,33 @@
+# The Mesa project publishes "official" code to:
+# - Pip: https://pypi.org/project/Mesa
+# - Docker Hub: not yet!
+
+# This example shows how to run a model using mounted volumes.
+# See Dockerfile for details on why.
+
+# Build and run using these commands from this directory:
+
+# 1) build the image
+# $ docker build . -t mesa_contact_trace_image
+
+# 2) Install docker-compose
+# $ pip install docker-compose
+
+# 3) Install example's dependencies. () creates new subshell so shell's working directory doesn't change
+# $ (pip3 install -r requirements.txt)
+
+# 4) Start the image and mount the volume
+# $ docker-compose up
+
+# 5) browse to http://127.0.0.1:8521 to see results
+
+version: '3'
+services:
+  mesa:
+    # Built on your computer with `docker build . -t mymesa_image`
+    image: mesa_contact_trace_image
+    # Mount host dir to image dir '/opt/mesa/mesa_contact_trace' before starting image
+    volumes:
+      - ./:/opt/mesa/mesa_contact_trace
+    ports:
+      - "8521:8521"
