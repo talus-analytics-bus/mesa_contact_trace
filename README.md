@@ -9,9 +9,8 @@ from project root.
 or
 
 You can build and run this Docker image with these commands:
-  `$ docker build . -t mesa_contact_trace_image`
-  `$ docker rm -f mesa_contact_trace_image`
-  `$ docker run --name mesa_contact_trace -p 8521:8521/tcp -it mesa_contact_trace_image`
+*  `$ docker build . -t mesa_contact_trace_image`
+*  `$ docker run --name mesa_contact_trace -p 8521:8521/tcp -it mesa_contact_trace_image`
 
 View at http://127.0.0.1:8521
 
